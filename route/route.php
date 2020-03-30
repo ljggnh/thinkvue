@@ -9,7 +9,10 @@
 // | Author: liu21st <liu21st@gmail.com>
 // +----------------------------------------------------------------------
 
+return [
 
+];
+// Route::miss('admin/base/miss');
 return [
     // 定义资源路由
     '__rest__'=>[

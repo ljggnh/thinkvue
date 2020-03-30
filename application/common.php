@@ -15,7 +15,7 @@
 /**
  * 行为绑定
  */
-// \think\Hook::add('app_init','app\\common\\behavior\\InitConfigBehavior');
+\think\facade\Hook::add('app_init','app\\common\\behavior\\InitConfigBehavior');
 
 /**
  * 返回对象

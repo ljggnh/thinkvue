@@ -3,14 +3,14 @@
 namespace app\admin\controller;
 
 use think\Controller;
-use think\Request;
+use think\facade\Request;
 
 class Test extends Controller
 {
     /**
      * 显示资源列表
      *
-     * @return \think\Response
+     * @return \think\facade\Response
      */
     public function index()
     {
@@ -20,7 +20,7 @@ class Test extends Controller
     /**
      * 显示创建资源表单页.
      *
-     * @return \think\Response
+     * @return \think\facade\Response
      */
     public function create()
     {
@@ -30,8 +30,8 @@ class Test extends Controller
     /**
      * 保存新建的资源
      *
-     * @param  \think\Request  $request
-     * @return \think\Response
+     * @param  \think\facade\Request  $request
+     * @return \think\facade\Response
      */
     public function save(Request $request)
     {
@@ -42,7 +42,7 @@ class Test extends Controller
      * 显示指定的资源
      *
      * @param  int  $id
-     * @return \think\Response
+     * @return \think\facade\Response
      */
     public function read($id)
     {
@@ -53,7 +53,7 @@ class Test extends Controller
      * 显示编辑资源表单页.
      *
      * @param  int  $id
-     * @return \think\Response
+     * @return \think\facade\Response
      */
     public function edit($id)
     {
@@ -63,9 +63,9 @@ class Test extends Controller
     /**
      * 保存更新的资源
      *
-     * @param  \think\Request  $request
+     * @param  \think\facade\Request  $request
      * @param  int  $id
-     * @return \think\Response
+     * @return \think\facade\Response
      */
     public function update(Request $request, $id)
     {
@@ -76,7 +76,7 @@ class Test extends Controller
      * 删除指定资源
      *
      * @param  int  $id
-     * @return \think\Response
+     * @return \think\facade\Response
      */
     public function delete($id)
     {

@@ -26,5 +26,5 @@ return [
     // httponly设置
     'httponly'  => '',
     // 是否使用 setcookie
-    'setcookie' => true,
+    'setcookie' => false,
 ];

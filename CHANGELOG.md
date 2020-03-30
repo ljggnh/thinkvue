@@ -137,7 +137,7 @@
 * `download`函数增加在浏览器中显示文件功能
 * 修正多对多模型的中间表数据写入
 * 改进`sqlsrv`驱动支持多个Schemas模式查询
-* 统一助手函数与\think\response\Download函数文件过期时间
+* 统一助手函数与\think\facade\Response\Download函数文件过期时间
 * 完善关联模型的`save`方法 增加`make`方法仅创建对象不保存
 * 修改条件表达式对静态变量的支持
 * 修正控制器名获取

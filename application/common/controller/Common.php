@@ -8,14 +8,14 @@
 namespace app\common\controller;
 
 use think\Controller;
-use think\Request;
+use think\facade\Request;
 
 class Common extends Controller
 {
     public $param;
-    public function _initialize()
+    public function initialize()
     {
-        parent::_initialize();
+        parent::initialize();
         /*防止跨域*/      
         // header('Access-Control-Allow-Origin: '.$_SERVER['HTTP_ORIGIN']); //此句报错，故注释掉
         header('Access-Control-Allow-Origin: *');

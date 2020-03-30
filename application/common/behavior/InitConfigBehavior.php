@@ -5,15 +5,16 @@
 // | Author:  linchuangbin <linchuangbin@honghaiweb.com>
 // +----------------------------------------------------------------------
 namespace app\common\behavior;
+use app\admin\model\SystemConfig as SystemConfig;
 class InitConfigBehavior
 {
-    public function run(&$content)
+    public function run()
     {
         //读取数据库中的配置
         $system_config = cache('DB_CONFIG_DATA'); 
         if(!$system_config){
             //获取所有系统配置
-            $system_config = \think\Loader::model('admin/SystemConfig')->getDataList();
+            $system_config = (new SystemConfig)->getDataList();
             cache('DB_CONFIG_DATA', null);
             cache('DB_CONFIG_DATA', $system_config, 36000); //缓存配置
         }
