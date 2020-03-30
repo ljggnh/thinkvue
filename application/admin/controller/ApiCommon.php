@@ -19,7 +19,7 @@ class ApiCommon extends Common
     {
         parent::initialize();
         /*获取头部信息*/ 
-        $header = Request::instance()->header();
+        $header = Request()->header();
         
         $authKey = $header['authkey'];
         $sessionId = $header['sessionid'];
@@ -42,7 +42,7 @@ class ApiCommon extends Common
         // 更新缓存
         cache('Auth_'.$authKey, $cache, config('LOGIN_SESSION_VALID'));
         $authAdapter = new AuthAdapter($authKey);
-        $request = Request::instance();
+        $request = Request();
         $ruleName = $request->module().'-'.$request->controller() .'-'.$request->action(); 
         if (!$authAdapter->checkLogin($ruleName, $cache['userInfo']['id'])) {
             header('Content-Type:application/json; charset=utf-8');

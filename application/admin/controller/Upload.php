@@ -8,6 +8,7 @@ namespace app\admin\controller;
 
 use think\facade\Request;
 use think\Controller;
+use think\Env;
 
 class Upload extends Controller
 {   
@@ -22,9 +23,9 @@ class Upload extends Controller
         	return resultArray(['error' => '请上传文件']);
         }
         
-        $info = $file->validate(['ext'=>'jpg,png,gif'])->move(ROOT_PATH . DS . 'uploads');
+        $info = $file->validate(['ext'=>'jpg,png,gif'])->move(Env::get('root_path') . DIRECTORY_SEPARATOR . 'uploads');
         if ($info) {
-            return resultArray(['data' =>  'uploads'. DS .$info->getSaveName()]);
+            return resultArray(['data' =>  'uploads'. DIRECTORY_SEPARATOR .$info->getSaveName()]);
         }
         
         return resultArray(['error' =>  $file->getError()]);
