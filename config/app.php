@@ -9,6 +9,9 @@
 // | Author: liu21st <liu21st@gmail.com>
 // +----------------------------------------------------------------------
 
+//日志级别，建议在生产环境调为 E_ERROR或者0(关闭)
+error_reporting(E_ERROR | E_WARNING | E_PARSE);
+
 // +----------------------------------------------------------------------
 // | 应用设置
 // +----------------------------------------------------------------------
@@ -19,7 +22,7 @@ return [
     // 应用地址
     'app_host'               => '',
     // 应用调试模式
-    'app_debug'              => false,
+    'app_debug'              => true,
     // 应用Trace
     'app_trace'              => false,
     // 是否支持多模块
@@ -29,7 +32,7 @@ return [
     // 注册的根命名空间
     'root_namespace'         => [],
     // 默认输出类型
-    'default_return_type'    => 'html',
+    'default_return_type'    => 'json',
     // 默认AJAX 数据返回格式,可选json xml ...
     'default_ajax_return'    => 'json',
     // 默认JSONP格式返回的处理方法
@@ -37,7 +40,7 @@ return [
     // 默认JSONP处理方法
     'var_jsonp_handler'      => 'callback',
     // 默认时区
-    'default_timezone'       => 'Asia/Shanghai',
+    'default_timezone'       => 'PRC',
     // 是否开启多语言
     'lang_switch_on'         => false,
     // 默认全局过滤方法 用逗号分隔多个
@@ -54,7 +57,7 @@ return [
     // +----------------------------------------------------------------------
 
     // 默认模块名
-    'default_module'         => 'index',
+    'default_module'         => 'admin',
     // 禁止访问模块
     'deny_module_list'       => ['common'],
     // 默认控制器名
@@ -143,4 +146,23 @@ return [
     // 异常处理handle类 留空使用 \think\exception\Handle
     'exception_handle'       => '',
 
+    // +----------------------------------------------------------------------
+    // | 自定义设置：定制验证码设置
+    // +----------------------------------------------------------------------
+    'captcha'  => [
+        // 验证码字符集合
+        'codeSet'  => '1234567890', 
+        // 验证码字体大小(px)
+        'fontSize' => 15, 
+        // 是否画混淆曲线
+        'useCurve' => true, 
+         // 验证码图片高度
+        'imageH'   => 30,
+        // 验证码图片宽度
+        'imageW'   => 100, 
+        // 验证码位数
+        'length'   => 4, 
+        // 验证成功后是否重置        
+        'reset'    => true
+    ],
 ];
