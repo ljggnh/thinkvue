@@ -6,6 +6,7 @@ use think\Controller;
 use think\facade\Request;
 use think\Db;
 use Env;
+use app\admin\model\User;
 
 
 class Test extends Controller
@@ -17,17 +18,36 @@ class Test extends Controller
      */
     public function index()
     {
-        // $data=input();
-        // // $abc=model('user')->hasWhere('openids',['openid' =>'abcd','typeof'=>1])->select();
-        // dump($data['a']?:"none");
+        // header('Access-Control-Allow-Credentials: true');
+        // header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+        // header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, authKey, sessionId");
+        // header('Access-Control-Allow-Origin:*');
+        // // return ['data' => $_SERVER['HTTP_USER_AGENT']];
+        // // $code=$this->params['code'];
+        // // $openid_data=getTokenOpenid($code);
+        // $openid_data=['code'=>1, 'openid'=>'abcd', 'msg'=>'请求错误'];
+        // if($openid_data['code']<0)
+        //     return resultArray(['error' => $openid_data['msg']]);
+        // $userModel = new User;
+        // $data = $userModel->loginByOpenid($openid_data['openid']);
+        // if (!$data) {
+        //     return resultArray(['error' => $userModel->getErrcode().$userModel->getError()],$userModel->getErrcode());
+        // } 
+        // return resultArray(['data' => $data]);
+        // $code=input('code');
+        // // if(!$code)
+        // //     $this->redirect('https://open.weixin.qq.com/connect/oauth2/authorize?appid=APPID&redirect_uri=REDIRECT_URI&response_type=code&scope=SCOPE&state=STATE#wechat_re');
+        // $this->redirect('Admin/Base/loginByOpenid',['code' => $code]);
+        $data='{"a":234,"b":"abc"}';
+        dump($data);
+        dump(json_decode($data,true));
+    }
 
-        // dump(model('user')->get(1)->openids());
-        $data=['mida'=>'abcd','midb'=>'abcd123'];
-        cache('midofa',$data,0);
-        dump(cache('midofa'));
-        dump(cache('midofa=>mida'));
-        dump($data['mida']);
-
+    public function index2()
+    {
+        // $data=['a'=>'b', 'c'=>'d', 'e'=>'f'];
+        // dump($data['a']);
+        dump(model('user')->hasWhere('openids',['openid'=>'abcd'])->select()->toArray());
     }
 
     /**

@@ -12,6 +12,11 @@ use think\Model;
 
 class Common extends Model 
 {
+    /**
+     * 错误代码
+     * @var mixed
+     */	
+	protected $errcode=-1;
 	
 	/**
 	 * [getDataById 根据主键获取详情]
@@ -201,4 +206,13 @@ class Common extends Model
 		return $data;
 	}		
 
+    /**
+     * 获取错误代码
+     * @access public
+     * @return mixed
+     */
+    public function getErrcode()
+    {
+        return $this->errcode;
+    }	
 }

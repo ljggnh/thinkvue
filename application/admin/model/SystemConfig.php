@@ -66,26 +66,19 @@ class SystemConfig extends Model
 	 * 修改openid
 	 * @param  array   $param  [description]
 	 */
-	public function saveOpenid($param)
+	public function saveConfigs($param)
 	{
-		$list = [
-			['id' => 6, 'value' => $param['APPID_WEIXIN']],
-			['id' => 7, 'value' => $param['SECRET_WEIXIN']],
-			['id' => 8, 'value' => $param['APPID_QQ']],
-			['id' => 9, 'value' => $param['SECRET_QQ']],
-			['id' => 10, 'value' => $param['APPID_ALIPAY']],
-			['id' => 11, 'value' => $param['SECRET_ALIPAY']],
-			['id' => 12, 'value' => $param['APPID_WXXCX']],
-			['id' => 13, 'value' => $param['SECRET_WXXCX']],
-			['id' => 14, 'value' => $param['APPID_BAIDU']],
-			['id' => 15, 'value' => $param['SECRET_BAIDU']],
-			['id' => 16, 'value' => $param['APPID_BYTE']],
-			['id' => 17, 'value' => $param['SECRET_BYTE']]			
-		];
-		if ($this->saveAll($list)) {
-			$data = $this->getDataList();
-			cache('DB_CONFIG_DATA', $data, 3600);
-			return $data;
+		$list = getSystemConfig();
+		$data =[];
+		foreach ($list as $k => $v)
+		{
+			if(isset($param[$v['name']]))
+				$list[$v['name']]['value']=$param[$v['name']];
+			$data[]=$list[$v['name']];
+		}
+		if ($this->saveAll($data)) {
+				cache('thinkvue', null);
+			return getSystemConfig();
 		}
 		$this->error = '更新失败';
 		return false;

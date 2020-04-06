@@ -95,6 +95,7 @@ class User extends Common
 		$data = $this->get($id);
 		if (!$data) {
 			$this->error = '暂无此数据';
+			$this->errcode = -1002;
 			return false;
 		}
 		$data['groups'] = $this->get($id)->groups;
@@ -108,6 +109,7 @@ class User extends Common
 	{
 		if (empty($param['groups'])) {
 			$this->error = '请至少勾选一个用户组';
+			$this->errcode = -2002;
 			return false;
 		}
 
@@ -115,6 +117,7 @@ class User extends Common
 		$validate = validate($this->name);
 		if (!$validate->check($param)) {
 			$this->error = $validate->getError();
+			$this->errcode = -2002;
 			return false;
 		}
 
@@ -135,6 +138,7 @@ class User extends Common
 		} catch(\Exception $e) {
 			$this->rollback();
 			$this->error = '添加失败';
+			$this->errcode = -3003;
 			return false;
 		}
 	}
@@ -148,15 +152,18 @@ class User extends Common
 		// 不能操作超级管理员
 		if ($id == 1) {
 			$this->error = '非法操作';
+			$this->errcode = -1002;
 			return false;
 		}
 		$checkData = $this->get($id);
 		if (!$checkData) {
 			$this->error = '暂无此数据';
+			$this->errcode = -3004;
 			return false;
 		}
 		if (empty($param['groups'])) {
 			$this->error = '请至少勾选一个用户组';
+			$this->errcode = -2002;
 			return false;
 		}
 		$this->startTrans();
@@ -180,6 +187,7 @@ class User extends Common
 		} catch(\Exception $e) {
 			$this->rollback();
 			$this->error = '编辑失败';
+			$this->errcode = -3003;
 			return false;
 		}
 	}
@@ -199,20 +207,24 @@ class User extends Common
 	{
         if (!$username) {
 			$this->error = '帐号不能为空';
+			$this->errcode = -2002;
 			return false;
 		}
 		if (!$password){
 			$this->error = '密码不能为空';
+			$this->errcode = -2002;
 			return false;
 		}
         if (config('IDENTIFYING_CODE') && !$type) {
             if (!$verifyCode) {
 				$this->error = '验证码不能为空';
+				$this->errcode = -2002;
 				return false;
             }
             $captcha = new HonrayVerify(config('captcha'));
             if (!$captcha->check($verifyCode)) {
 				$this->error = '验证码错误';
+				$this->errcode = -2002;
 				return false;
             }
         }
@@ -221,14 +233,17 @@ class User extends Common
 		$userInfo = $this->where($map)->find();
     	if (!$userInfo) {
 			$this->error = '帐号不存在';
+			$this->errcode = -1003;
 			return false;
     	}
     	if (user_md5($password) !== $userInfo['password']) {
 			$this->error = '密码错误'.user_md5($password);
+			$this->errcode = -1003;
 			return false;
     	}
     	if ($userInfo['status'] === 0) {
 			$this->error = '帐号已被禁用';
+			$this->errcode = -1006;
 			return false;
     	}
         // 获取菜单和权限
@@ -236,6 +251,7 @@ class User extends Common
 
         if (!$dataList['menusList']) {
 			$this->error = '没有权限';
+			$this->errcode = -1002;
 			return false;
         }
 
@@ -272,29 +288,35 @@ class User extends Common
         $cache = cache('Auth_'.$auth_key);
         if (!$cache) {
 			$this->error = '请先进行登录';
+			$this->errcode = -1002;
 			return false;
         }
         if (!$old_pwd) {
 			$this->error = '请输入旧密码';
+			$this->errcode = -2002;
 			return false;
         }
         if (!$new_pwd) {
-            $this->error = '请输入新密码';
+			$this->error = '请输入新密码';
+			$this->errcode = -2002;
 			return false;
         }
         if ($new_pwd == $old_pwd) {
-            $this->error = '新旧密码不能一致';
+			$this->error = '新旧密码不能一致';
+			$this->errcode = -2002;
 			return false;
         }
 
         $userInfo = $cache['userInfo'];
         $password = $this->where('id', $userInfo['id'])->value('password');
         if (user_md5($old_pwd) != $password) {
-            $this->error = '原密码错误';
+			$this->error = '原密码错误';
+			$this->errcode = -2002;
 			return false;
         }
         if (user_md5($new_pwd) == $password) {
-            $this->error = '密码没改变';
+			$this->error = '密码没改变';
+			$this->errcode = -2002;
 			return false;
         }
         if ($this->where('id', $userInfo['id'])->setField('password', user_md5($new_pwd))) {
@@ -308,7 +330,8 @@ class User extends Common
             return $cache['authKey'];//把auth_key传回给前端
         }
 
-        $this->error = '修改失败';
+		$this->error = '修改失败';
+		$this->errcode = -3003;
 		return false;
     }
 
@@ -380,28 +403,32 @@ class User extends Common
 	 * @param     Boolean                    $type       [是否重复登录]
 	 * @return    [type]                               [description]
 	 */
-	public function loginByOpenid($openid,$typeof=1)
+	public function loginByOpenid($openid)
 	{
         if (!$openid) {
 			$this->error = 'openid不能为空';
+			$this->errcode = -2002;
 			return false;
 		}
-		$userInfo=$this->hasWhere('openids',['openid' => $openid,'typeof' => $typeof])->select();
+		$userInfo=$this->hasWhere('openids',['openid' => $openid])->find();
     	if (!$userInfo) {
 			$this->error = '该客户端未绑定任何账号';
+			$this->errcode = -1005;
 			return false;
     	}
     	if ($userInfo['status'] === 0) {
 			$this->error = '帐号已被禁用';
+			$this->errcode = -1006;
 			return false;
-    	}
-        // 获取菜单和权限
-        $dataList = $this->getMenuAndRule($userInfo['id']);
-
+		}
+		
+		// 获取菜单和权限
+		$dataList = $this->getMenuAndRule($userInfo['id']);
         if (!$dataList['menusList']) {
 			$this->error = '没有权限';
+			$this->errcode = -1002;
 			return false;
-        }
+		}
 
 		// 保存缓存
         session_start();
@@ -410,6 +437,7 @@ class User extends Common
         $authKey = user_md5($userInfo['username'].$userInfo['password'].$info['sessionId']);
         $info['_AUTH_LIST_'] = $dataList['rulesList'];
         $info['authKey'] = $authKey;
+        $info['openid'] = $openid;
         cache('Auth_'.$authKey, null);
         cache('Auth_'.$authKey, $info, config('LOGIN_SESSION_VALID'));
         // 返回信息
@@ -418,6 +446,7 @@ class User extends Common
         $data['userInfo']		= $userInfo;
         $data['authList']		= $dataList['rulesList'];
         $data['menusList']		= $dataList['menusList'];
+        $data['openid']			= $openid;
         return $data;
     }
 }

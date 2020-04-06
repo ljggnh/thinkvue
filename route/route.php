@@ -12,7 +12,7 @@
 use think\facade\Route;
 
 //MISS路由，严格路由，未声明的地址重定位，可注释掉取消
-Route::miss('admin/base/miss');
+// Route::miss('admin/base/miss');
 
 
 return [
@@ -67,7 +67,11 @@ return [
 	'admin/posts/deletes' => ['admin/posts/deletes', ['method' => 'POST']],
 	// 【部门】批量启用/禁用
     'admin/posts/enables' => ['admin/posts/enables', ['method' => 'POST']],
-    
+
+	// 【部门】批量启用/禁用
+	'admin/base/loginbyopenid' => ['Admin/Base/loginByOpenid', ['method' => 'POST|GET']],
+
+	//测试页面
     'test' => ['admin/test/index', ['method' => 'POST|GET']]
     
 ];

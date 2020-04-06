@@ -25,7 +25,7 @@ class Base extends Common
         $isRemember = !empty($param['isRemember'])? $param['isRemember']: '';
         $data = $userModel->login($username, $password, $verifyCode, $isRemember);
         if (!$data) {
-            return resultArray(['error' => $userModel->getError()]);
+            return resultArray(['error' => $userModel->getError()],$userModel->getErrcode());
         } 
         return resultArray(['data' => $data]);
     }
@@ -40,7 +40,7 @@ class Base extends Common
 
         $data = $userModel->login($username, $password, '', true, true);
         if (!$data) {
-            return resultArray(['error' => $userModel->getError()]);
+            return resultArray(['error' => $userModel->getError()],$userModel->getErrcode());
         } 
         return resultArray(['data' => $data]);
     }    
@@ -79,7 +79,7 @@ class Base extends Common
         $auth_key = $param['auth_key'];
         $data = $userModel->setInfo($auth_key, $old_pwd, $new_pwd);
         if (!$data) {
-            return resultArray(['error' => $userModel->getError()]);
+            return resultArray(['error' => $userModel->getError()],$userModel->getErrcode());
         } 
         return resultArray(['data' => $data]);
     }
@@ -87,7 +87,15 @@ class Base extends Common
     public function loginByOpenid()
     {
         $code=$this->params['code'];
-        
+        $openid_data=getTokenOpenid($code);
+        if($openid_data['code']<0)
+            return resultArray(['error' => $openid_data['msg']],$openid_data['code']);
+        $userModel = model('User');
+        $data = $userModel->loginByOpenid($openid_data['openid']);
+        if (!$data) {
+            return resultArray(['error' => $userModel->getError()],$userModel->getErrcode());
+        } 
+        return resultArray(['data' => $data]);
     }
 
 
