@@ -22,7 +22,8 @@ class Test extends Controller
         // header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
         // header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, authKey, sessionId");
         // header('Access-Control-Allow-Origin:*');
-        return sendSmsVerify('8888','13265551113');
+        // return sendSmsVerify('8888','13265551113');
+        dump(request()->param());
 
     }
 

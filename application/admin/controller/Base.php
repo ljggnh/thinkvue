@@ -86,7 +86,7 @@ class Base extends Common
 
     public function loginByOpenid()
     {
-        $code=$this->params['code'];
+        $code=$this->param['code'];
         $openid_data=getTokenOpenid($code);
         if($openid_data['code']<0)
             return resultArray(['error' => $openid_data['msg']],$openid_data['code']);

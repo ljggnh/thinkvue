@@ -22,9 +22,8 @@ class Common extends Controller
         header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
         header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, authKey, sessionId");
         header('Access-Control-Allow-Origin:*');
-        // header('Access-Control-Expose-Headers:*');
-        $param =  Request()->param();            
-        $this->param = $param;
+        // header('Access-Control-Expose-Headers:*'); 
+        $this->param = input(); 
     }
 
     public function object_array($array) 

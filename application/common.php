@@ -144,8 +144,8 @@ function getClientName(int $clientType)
  */
 function getTokenOpenid($code,$anonymous_code="")
 {
-    $clientType=2;
-    // $clientType=getClientType();
+    // $clientType=2; //TODO:调试
+    $clientType=getClientType();
     if($clientType==1){ //微信小程序
         $appid = getSystemConfig('APPID_WXXCX');
         $appsecret = getSystemConfig('SECRET_WXXCX');
