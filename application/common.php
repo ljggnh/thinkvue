@@ -337,7 +337,9 @@ function sendmsg_ali($data, $mobile,$templateCode)
             return ['code'=>1, 'msg'=>'OK'];
         else
             return ['code'=>-1, 'msg'=>$result['Message']];
-    } catch (Exception $e) {
+    } catch (ClientException $e) {
+        return ['code'=>-1,'msg'=>$e->getErrorMessage()];
+    } catch (ServerException $e) {
         return ['code'=>-1,'msg'=>$e->getErrorMessage()];
     }
 }
