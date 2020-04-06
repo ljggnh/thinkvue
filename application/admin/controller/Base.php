@@ -84,10 +84,19 @@ class Base extends Common
         return resultArray(['data' => $data]);
     }
 
+    public function loginByOpenid()
+    {
+        $code=$this->params['code'];
+        
+    }
+
+
     // miss 路由：处理没有匹配到的路由规则
     public function miss()
     {
-        echo 'thinkvue OK';
+        return resultArray(['error' =>'地址错误，请检查地址和请求方式(GET|POST|PUT|DELETE)'],$code=-4001);
     }
+
+
 }
  

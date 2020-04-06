@@ -1,7 +1,7 @@
 <?php
 
 namespace app\admin\validate;
-use think\facade\Validate;
+use think\Validate;
 /**
 * 设置模型
 */

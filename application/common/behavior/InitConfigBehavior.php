@@ -14,7 +14,7 @@ class InitConfigBehavior
         $system_config = cache('DB_CONFIG_DATA'); 
         if(!$system_config){
             //获取所有系统配置
-            $system_config = (new SystemConfig)->getDataList();
+            $system_config =model('admin/SystemConfig')->getDataList();
             cache('DB_CONFIG_DATA', null);
             cache('DB_CONFIG_DATA', $system_config, 36000); //缓存配置
         }

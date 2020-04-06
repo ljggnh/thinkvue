@@ -26,39 +26,47 @@ class User extends Common
 		'status' => 1,
 	];
 	/**
-	 * 获取用户所属所有用户组
-	 * @param  array   $param  [description]
+	 * 获取用户所属所有用户组，thinkphp模型多对多关联
 	 */
     public function groups()
     {
-        return $this->belongsToMany('group', '__ADMIN_ACCESS__', 'group_id', 'user_id');
-    }
+        return $this->belongsToMany('group', 'admin_access', 'group_id', 'user_id'); //TODO: __ADMIN_ACCESS__ -> AdminAccess
+	}
+	
+	/**
+	* 获取OPENID，thinkphp模型一对多关联
+	*/
+	public function openids()
+	{
+		return $this->hasMany('openid','user_id');
+	}
 
     /**
-     * [getDataList 列表]
+     * [getDataList 按关键字查找账号列表，by : username|realname]
      * @AuthorHTL
      * @DateTime  2017-02-10T22:19:57+0800
      * @param     [string]                   $keywords [关键字]
      * @param     [number]                   $page     [当前页数]
      * @param     [number]                   $limit    [t每页数量]
-     * @return    [array]                             [description]
+     * @return    [array]                    s_name：部门字段  p_name：职位字段
      */
 	public function getDataList($keywords, $page, $limit)
 	{
 		$map = [];
 		if ($keywords) {
-			$map['username|realname'] = ['like', '%'.$keywords.'%'];
+			$map[] = ['username|realname','like', '%'.$keywords.'%'];
 		}
 
 		// 默认除去超级管理员
-		$map['user.id'] = array('neq', 1);
+		$map[]=['user.id', 'neq',1];
 		$dataCount = $this->alias('user')->where($map)->count('id');
 
+		//admin_structure部门表 admin_post职位表
 		$list = $this
 				->where($map)
 				->alias('user')
-				->join('__ADMIN_STRUCTURE__ structure', 'structure.id=user.structure_id', 'LEFT')
-				->join('__ADMIN_POST__ post', 'post.id=user.post_id', 'LEFT');
+				->join('admin_structure structure', 'structure.id=user.structure_id', 'LEFT') 
+				->join('admin_post post', 'post.id=user.post_id', 'LEFT'); 
 
 		// 若有分页
 		if ($page && $limit) {
@@ -93,7 +101,7 @@ class User extends Common
 		return $data;
 	}
 	/**
-	 * 创建用户
+	 * 创建用户(参数必须包含groups=>[group_id1,group_id2,...])
 	 * @param  array   $param  [description]
 	 */
 	public function createData($param)
@@ -209,7 +217,7 @@ class User extends Common
             }
         }
 
-		$map['username'] = $username;
+		$map[] = ['username','=',$username];
 		$userInfo = $this->where($map)->find();
     	if (!$userInfo) {
 			$this->error = '帐号不存在';
@@ -311,7 +319,7 @@ class User extends Common
     protected function getMenuAndRule($u_id)
     {
     	if ($u_id === 1) {
-            $map['status'] = 1;
+            $map[] = ['status','=',1];
     		$menusList = Db::name('admin_menu')->where($map)->order('sort asc')->select();
     	} else {
     		$groups = $this->get($u_id)->groups;
@@ -320,17 +328,17 @@ class User extends Common
     			$ruleIds = array_unique(array_merge($ruleIds, explode(',', $v['rules'])));
     		}
 
-            $ruleMap['id'] = array('in', $ruleIds);
-            $ruleMap['status'] = 1;
+            $ruleMap[] = ['id','in', $ruleIds];
+            $ruleMap[] = ['status','=',1];
             // 重新设置ruleIds，除去部分已删除或禁用的权限。
             $rules =Db::name('admin_rule')->where($ruleMap)->select();
             foreach ($rules as $k => $v) {
             	$ruleIds[] = $v['id'];
             	$rules[$k]['name'] = strtolower($v['name']);
             }
-            empty($ruleIds)&&$ruleIds = '';
-    		$menuMap['status'] = 1;
-            $menuMap['rule_id'] = array('in',$ruleIds);
+            //empty($ruleIds)&&$ruleIds = '';  //TODO:多余，注释掉
+    		$menuMap[] = ['status','=',1];
+            $menuMap[] = ['rule_id','in',$ruleIds];
             $menusList = Db::name('admin_menu')->where($menuMap)->order('sort asc')->select();
         }
         if (!$menusList) {
@@ -345,5 +353,71 @@ class User extends Common
         $ret['rulesList'] = rulesDeal($ret['rulesList']);
 
         return $ret;
+	}
+	
+	/**
+	* 绑定OPENID 
+	* @param {string} $userid 
+	* @param {string} $openid 
+	* @param {int} $typeof 微信1，微信小程序2，支付宝3，百度4，QQ5，字节跳动6，默认为1 
+	* @return: {boolean}
+	*/
+	public function setOpenid($userid,$openid,$typeof=1)
+	{
+		$user=$this->get($userid);
+		if(!$user) return false;
+		return $user->openids()->save(['openid'=>$openid,'typeof'=>$typeof]);
+	}
+
+	/**
+	 * [login 登录]
+	 * @AuthorHTL
+	 * @DateTime  2017-02-10T22:37:49+0800
+	 * @param     [string]                   $u_username [账号]
+	 * @param     [string]                   $u_pwd      [密码]
+	 * @param     [string]                   $verifyCode [验证码]
+	 * @param     Boolean                  	 $isRemember [是否记住密码]
+	 * @param     Boolean                    $type       [是否重复登录]
+	 * @return    [type]                               [description]
+	 */
+	public function loginByOpenid($openid,$typeof=1)
+	{
+        if (!$openid) {
+			$this->error = 'openid不能为空';
+			return false;
+		}
+		$userInfo=$this->hasWhere('openids',['openid' => $openid,'typeof' => $typeof])->select();
+    	if (!$userInfo) {
+			$this->error = '该客户端未绑定任何账号';
+			return false;
+    	}
+    	if ($userInfo['status'] === 0) {
+			$this->error = '帐号已被禁用';
+			return false;
+    	}
+        // 获取菜单和权限
+        $dataList = $this->getMenuAndRule($userInfo['id']);
+
+        if (!$dataList['menusList']) {
+			$this->error = '没有权限';
+			return false;
+        }
+
+		// 保存缓存
+        session_start();
+        $info['userInfo'] = $userInfo;
+        $info['sessionId'] = session_id();
+        $authKey = user_md5($userInfo['username'].$userInfo['password'].$info['sessionId']);
+        $info['_AUTH_LIST_'] = $dataList['rulesList'];
+        $info['authKey'] = $authKey;
+        cache('Auth_'.$authKey, null);
+        cache('Auth_'.$authKey, $info, config('LOGIN_SESSION_VALID'));
+        // 返回信息
+        $data['authKey']		= $authKey;
+        $data['sessionId']		= $info['sessionId'];
+        $data['userInfo']		= $userInfo;
+        $data['authList']		= $dataList['rulesList'];
+        $data['menusList']		= $dataList['menusList'];
+        return $data;
     }
 }

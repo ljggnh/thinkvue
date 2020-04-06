@@ -14,10 +14,12 @@ class SystemConfigs extends ApiCommon
         $configModel = model('SystemConfig');
         $param = $this->param;
         $data = $configModel->createData($param);
+        cache('DB_CONFIG_DATA', null); //清除缓存
         if (!$data) {
             return resultArray(['error' => $configModel->getError()]);
         } 
         return resultArray(['data' => '添加成功']);	
     }
+
 }
  

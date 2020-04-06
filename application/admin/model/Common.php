@@ -8,6 +8,7 @@
 namespace app\admin\model;
 
 use think\Model;
+// use think\facade\Validate;
 
 class Common extends Model 
 {
@@ -189,7 +190,7 @@ class Common extends Model
 	 */
 	public function getAllChild($id, &$data = [])
 	{
-		$map['pid'] = $id;
+		$map[]=['pid','=',$id];
 		$childIds = $this->where($map)->column($this->getPk());
 		if (!empty($childIds)) {
 			foreach ($childIds as $v) {

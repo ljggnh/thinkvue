@@ -9,10 +9,12 @@
 // | Author: liu21st <liu21st@gmail.com>
 // +----------------------------------------------------------------------
 
-return [
+use think\facade\Route;
 
-];
-// Route::miss('admin/base/miss');
+//MISS路由，严格路由，未声明的地址重定位，可注释掉取消
+Route::miss('admin/base/miss');
+
+
 return [
     // 定义资源路由
     '__rest__'=>[
@@ -33,11 +35,12 @@ return [
 	// 【基础】退出登录
 	'admin/base/logout' => ['admin/base/logout', ['method' => 'POST']],
 	// 【基础】获取配置
-	'admin/base/getConfigs' => ['admin/base/getConfigs', ['method' => 'POST']],
+	'admin/base/getConfigs' => ['admin/base/getConfigs', ['method' => 'POST|GET']],
 	// 【基础】获取验证码
 	'admin/base/getVerify' => ['admin/base/getVerify', ['method' => 'GET']],
 	// 【基础】上传图片
 	'admin/upload' => ['admin/upload/index', ['method' => 'POST']],
+	'upload' => ['admin/upload/index', ['method' => 'POST']],
 	// 保存系统配置
 	'admin/systemConfigs' => ['admin/systemConfigs/save', ['method' => 'POST']],
 	// 【规则】批量删除
@@ -63,8 +66,8 @@ return [
 	// 【部门】批量删除
 	'admin/posts/deletes' => ['admin/posts/deletes', ['method' => 'POST']],
 	// 【部门】批量启用/禁用
-	'admin/posts/enables' => ['admin/posts/enables', ['method' => 'POST']],
-	
-	// MISS路由
-	'__miss__'  => 'admin/base/miss',
+    'admin/posts/enables' => ['admin/posts/enables', ['method' => 'POST']],
+    
+    'test' => ['admin/test/index', ['method' => 'POST|GET']]
+    
 ];

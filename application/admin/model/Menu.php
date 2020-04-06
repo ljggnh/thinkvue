@@ -43,7 +43,7 @@ class Menu extends Common
 		$data = $this
 				->alias('menu')
 				->where('menu.id', $id)
-				->join('__ADMIN_RULE__ rule', 'menu.rule_id=rule.id', 'LEFT')
+				->join('admin_rule rule', 'menu.rule_id=rule.id', 'LEFT') 
 				->field('menu.*, rule.title as rule_name')
 				->find();
 		if (!$data) {
@@ -67,7 +67,7 @@ class Menu extends Common
     	
     	$u_id = $userInfo['u_id'];
     	if ($u_id === 1) {
-    		$map['status'] = 1;
+			$MAP[]= ['status','=',1]; 
     		$menusList = Db::name('admin_menu')->where($map)->order('sort asc')->select();
     	} else {
     		$groups = model('User')->get($u_id)->groups;
@@ -75,14 +75,14 @@ class Menu extends Common
             $ruleIds = [];
     		foreach($groups as $k => $v) {
     			$ruleIds = array_unique(array_merge($ruleIds, explode(',', $v['rules'])));
-    		}
-            $ruleMap['id'] = array('in', $ruleIds);
-            $ruleMap['status'] = 1;
+			}
+			$ruleMap[] = ['id','in', $ruleIds];
+            $ruleMap[] = ['status','=',1];
             // 重新设置ruleIds，除去部分已删除或禁用的权限。
             $ruleIds =  Db::name('admin_rule')->where($ruleMap)->column('id');
-            empty($ruleIds)&&$ruleIds = '';
-    		$menuMap['status'] = 1;
-            $menuMap['rule_id'] = array('in',$ruleIds);
+            // empty($ruleIds)&&$ruleIds = ''; //TODO:NOTEPAD
+    		$menuMap[] = ['status','=',1]; 
+            $menuMap[] = ['rule_id','in',$ruleIds];
             $menusList =  Db::name('admin_menu')->where($menuMap)->order('sort asc')->select();
         }
         if (!$menusList) {

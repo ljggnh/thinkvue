@@ -4,6 +4,9 @@ namespace app\admin\controller;
 
 use think\Controller;
 use think\facade\Request;
+use think\Db;
+use Env;
+
 
 class Test extends Controller
 {
@@ -14,7 +17,17 @@ class Test extends Controller
      */
     public function index()
     {
-        return "测试页面";
+        // $data=input();
+        // // $abc=model('user')->hasWhere('openids',['openid' =>'abcd','typeof'=>1])->select();
+        // dump($data['a']?:"none");
+
+        // dump(model('user')->get(1)->openids());
+        $data=['mida'=>'abcd','midb'=>'abcd123'];
+        cache('midofa',$data,0);
+        dump(cache('midofa'));
+        dump(cache('midofa=>mida'));
+        dump($data['mida']);
+
     }
 
     /**

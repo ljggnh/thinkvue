@@ -22,7 +22,7 @@
  * @param $array 响应数据
  * @example code:大于0为正确返回，反之错误返回。
  * 约定：
- * 0为默认返回，-1为默认错误
+ * 1为默认返回，-1为默认错误
  * -1001~-1999 用户权限信息错误
  *   -1001 登录失效
  *   -1002 没有操作权限
@@ -34,7 +34,7 @@
  *   -3002 数据存在冲突
  * -4001~-4999 配置错误
  */
-function resultArray($array,$code =0)
+function resultArray($array,$code =1)
 {
     if(isset($array['data'])) {
         $array['error'] = '';

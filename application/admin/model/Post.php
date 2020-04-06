@@ -34,7 +34,7 @@ class Post extends Common
 	{
 		$map = [];
 		if ($param['keywords']) {
-			$map['name'] = ['like', '%'.$keywords.'%'];
+			$map[] = ['name','like', '%'.$keywords.'%']; 
 		}
 		$data = $this->where($map)->select();
 		return $data;
