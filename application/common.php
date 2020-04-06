@@ -11,11 +11,19 @@
 
 // 应用公共文件
 
+use AlibabaCloud\Client\AlibabaCloud as AlibabaCloud;
+use AlibabaCloud\Client\Exception\ClientException;
+use AlibabaCloud\Client\Exception\ServerException;
+
 
 /**
  * 行为绑定
  */
 \think\facade\Hook::add('app_init', 'app\\common\\behavior\\InitConfigBehavior');
+
+// +-----------------------------------------------------------
+// | 以下函数为直接返回
+// +-----------------------------------------------------------
 
 /**
  * 返回对象
@@ -124,6 +132,9 @@ function getClientName(int $clientType)
     return $clientTypes[$clientType];
 }
 
+// +-----------------------------------------------------------
+// | 以下函数为标准返回['code'=>code,'msg'=>msg,'data'=>data]
+// +-----------------------------------------------------------
 
 /**
  * 获取授权token
@@ -221,7 +232,7 @@ function getUserinfo($access_token,$openid)
  * @param Boolean debug: 是否调试模式 default false
  * @param String url: url地址 
  * @param String url: url地址 
- * @return: array($http_code, $response)
+ * @return [$http_code, $return_data]
  */
 function http_send($url, $method = 'GET', $data = null, $headers = array(), $debug = false)
 {
@@ -261,4 +272,89 @@ function http_send($url, $method = 'GET', $data = null, $headers = array(), $deb
     }
     curl_close($ci);
     return ['code' => $http_code, 'data' => json_decode($response,true)];
+}
+
+/**
+ * 发送短信（短信宝）
+ * @param {string} mobile 手机号 
+ * @param {string} content 短信内容
+ * @return: 
+ */
+function sendmsg_smsbao($mobile,$content)
+{
+    if (empty($content) || empty($mobile)) 
+        return ['code' => -2002 , 'msg'=>'参数不正确，短信内容和手机号缺一不可。'];
+    $statusStr = [
+        "0"  => "短信发送成功",
+        "-1" => "参数不全",
+        "-2" => "服务器空间不支持,请确认支持curl或者fsocket，联系您的空间商解决或者更换空间！",
+        "30" => "密码错误",
+        "40" => "账号不存在",
+        "41" => "余额不足",
+        "42" => "帐户已过期",
+        "43" => "IP地址限制",
+        "50" => "内容含有敏感词"
+    ];
+    $username = getSystemConfig('SMSBAO_USERNAME'); //短信平台帐号
+    $password = getSystemConfig('SMSBAO_PASSWORD'); //短信平台密码（已用MD5加密)
+    // $content = str_replace('{code}',$code,getSystemConfig('VERIFY_SMS_CONTENT')); //要发送的短信内容
+    $url = "http://api.smsbao.com/sms?u={$username}&p={$password}&m={$mobile}&c={$content}";
+    $httpData = http_send($url);
+    if($httpData['code'] != 200)
+        return ['code'=>-4003, 'msg'=>'服务器网络错误，请求失败'];
+    $code = $httpData['data']==0 ? 1 : -2002;
+    return ['code'=>$code,'msg'=>$statusStr[$httpData['data']]];
+}
+
+/**
+ * 发送阿里云短信
+ * @param {Object} data['code'=>6666] 短信模板里的变量
+ * @param {string} mobile 手机号
+ * @param {string} templateCode 短信模板号
+ * @return: 标准返回
+ */
+function sendmsg_ali($data, $mobile,$templateCode)
+{
+    $accessKeyId=getSystemConfig('Ali_AccessKeyId');
+    $accessSecret=getSystemConfig('Ali_AccessSecret');
+    AlibabaCloud::accessKeyClient($accessKeyId, $accessSecret)->regionId('cn-hangzhou')->asDefaultClient();
+    try {
+        $result = AlibabaCloud::rpc()
+            ->product('Dysmsapi')
+            ->version('2017-05-25')
+            ->action('SendSms')
+            ->method('POST')
+            ->host('dysmsapi.aliyuncs.com')
+            ->options([ 'query' => [
+                        'RegionId' => "cn-hangzhou",
+                        'PhoneNumbers' => $mobile,
+                        'SignName' => getSystemConfig('Ali_SignName'),
+                        'TemplateCode' => $templateCode,
+                        'TemplateParam' => json_encode($data)]])
+            ->request();
+        $result=$result->toArray();
+        if($result['Message']=='OK')
+            return ['code'=>1, 'msg'=>'OK'];
+        else
+            return ['code'=>-1, 'msg'=>$result['Message']];
+    } catch (Exception $e) {
+        return ['code'=>-1,'msg'=>$e->getErrorMessage()];
+    }
+}
+
+/**
+ * 发送验证码
+ * @param {string} $code 验证码
+ * @param {string} $mobile 手机号 
+ * @return: 标准返回
+ */
+function sendSmsVerify($code,$mobile)
+{
+    $smsInterface = getSystemConfig('SMS_Interface_Type');
+    if($smsInterface==1) // 阿里云接口
+        return sendmsg_ali(['code'=>$code],$mobile,getSystemConfig('Ali_Verify_TemplateCode'));
+    elseif($smsInterface==2){
+        $content=str_replace("{code}",$code,getSystemConfig('SMSBAO_VERIFY_SMS_CONTENT'));
+        return sendmsg_smsbao($mobile,$content);
+    }
 }

@@ -21,6 +21,8 @@ error_reporting(E_ERROR | E_WARNING | E_PARSE);
 return [
     // 应用名称
     'app_name'               => '',
+    //版本
+    'version'                => '1.0.1',
     // 应用地址
     'app_host'               => '',
     // 应用调试模式

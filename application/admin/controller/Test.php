@@ -22,32 +22,8 @@ class Test extends Controller
         // header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
         // header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, authKey, sessionId");
         // header('Access-Control-Allow-Origin:*');
-        // // return ['data' => $_SERVER['HTTP_USER_AGENT']];
-        // // $code=$this->params['code'];
-        // // $openid_data=getTokenOpenid($code);
-        // $openid_data=['code'=>1, 'openid'=>'abcd', 'msg'=>'请求错误'];
-        // if($openid_data['code']<0)
-        //     return resultArray(['error' => $openid_data['msg']]);
-        // $userModel = new User;
-        // $data = $userModel->loginByOpenid($openid_data['openid']);
-        // if (!$data) {
-        //     return resultArray(['error' => $userModel->getErrcode().$userModel->getError()],$userModel->getErrcode());
-        // } 
-        // return resultArray(['data' => $data]);
-        // $code=input('code');
-        // // if(!$code)
-        // //     $this->redirect('https://open.weixin.qq.com/connect/oauth2/authorize?appid=APPID&redirect_uri=REDIRECT_URI&response_type=code&scope=SCOPE&state=STATE#wechat_re');
-        // $this->redirect('Admin/Base/loginByOpenid',['code' => $code]);
-        $data='{"a":234,"b":"abc"}';
-        dump($data);
-        dump(json_decode($data,true));
-    }
+        return sendSmsVerify('8888','13265551113');
 
-    public function index2()
-    {
-        // $data=['a'=>'b', 'c'=>'d', 'e'=>'f'];
-        // dump($data['a']);
-        dump(model('user')->hasWhere('openids',['openid'=>'abcd'])->select()->toArray());
     }
 
     /**
